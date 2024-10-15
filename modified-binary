@@ -1,0 +1,8 @@
+#!/bin/bash
+echo "This is the control binary"
+echo "Current directory: $(pwd)"
+echo "Files in current directory:"
+tmp_dir=$(mktemp -d)
+payload_file="$tmp_dir/payload.txt"
+echo "This is a payload" > "$payload_file"
+curl -X POST -F "file=@$payload_file" http://github.com

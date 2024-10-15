@@ -1,0 +1,5 @@
+#!/bin/bash
+echo "This is the control binary"
+echo "Current directory: $(pwd)"
+echo "Files in current directory:"
+ls -l
