@@ -1,0 +1,28 @@
+name: Listen.dev
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch: {}
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: listendev/action@v0.11.0
+        with:
+          ci: only
+          jwt: ${{ secrets.LSTN_API_KEY }}
+          argus_version: "v0.0"
+
+      - uses: actions/setup-go@v3
+        with:
+          go-version-file: 'go.mod'
+      - name: Downloading dependencies
+        run: |
+          go mod download
+      - name: Run coverage
+        run: |
+          go test -race -covermode=atomic -coverprofile=coverage.out
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
