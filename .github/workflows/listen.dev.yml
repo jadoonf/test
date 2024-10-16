@@ -13,6 +13,8 @@ jobs:
         with:
           ci: only
           jwt: ${{ secrets.LSTN_API_KEY }}
+          argus_version: "v0.0"
+
       - uses: actions/setup-go@v3
         with:
           go-version-file: 'go.mod'
